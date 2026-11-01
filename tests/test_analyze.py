@@ -43,3 +43,22 @@ def test_filter_expressed_removes_low_probes():
     )
     kept = analyze.filter_expressed(expr, min_expr=50, min_samples=3)
     assert list(kept.index) == ["expressed"]
+
+
+def test_merge_genes_and_top_genes():
+    import add_genes
+    res = pd.DataFrame({
+        "probe": ["p1", "p2", "p3"],
+        "mean_log2fc": [2.0, -1.5, 3.0],
+        "fdr": [0.001, 0.01, 0.0001],
+        "significant": [True, True, True],
+    })
+    annot = pd.DataFrame({
+        "probe": ["p1", "p2", "p3"],
+        "gene_symbol": ["GENEA", "GENEB /// GENEC", ""],
+        "gene_title": ["a", "b", ""],
+    })
+    merged = add_genes.merge_genes(res, annot)
+    assert merged.loc[merged["probe"] == "p3", "gene_symbol"].iloc[0] == ""
+    top = add_genes.top_genes(merged)
+    assert list(top["gene"]) == ["GENEA", "GENEB"]   # p3 has no gene, p1 beats p2 on FDR

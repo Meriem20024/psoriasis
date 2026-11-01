@@ -5,8 +5,8 @@ source "$SCRIPT_DIR/utils.sh"
 
 RAW_DIR="${1:?usage: fetch.sh RAW_DIR}"
 SUMS="$RAW_DIR/../checksums.sha256"
-BASE="https://ftp.ncbi.nlm.nih.gov/geo/series/GSE34nnn/GSE34248"
-FILES=("matrix/GSE34248_series_matrix.txt.gz" "suppl/GSE34248_RAW.tar")
+BASE="https://ftp.ncbi.nlm.nih.gov/geo"
+FILES=("series/GSE34nnn/GSE34248/matrix/GSE34248_series_matrix.txt.gz" "series/GSE34nnn/GSE34248/suppl/GSE34248_RAW.tar" "platforms/GPLnnn/GPL570/annot/GPL570.annot.gz")
 
 mkdir -p "$RAW_DIR"
 
@@ -24,6 +24,7 @@ done
 
 # Integrity: test the archives, then create or verify SHA-256 checksums
 gzip -t "$RAW_DIR/GSE34248_series_matrix.txt.gz" || die "Corrupted file: series matrix" 4
+gzip -t "$RAW_DIR/GPL570.annot.gz" || die "Corrupted file: annotation" 4
 tar -tf "$RAW_DIR/GSE34248_RAW.tar" > /dev/null || die "Corrupted file: RAW.tar" 4
 
 if [[ -f "$SUMS" ]]; then
