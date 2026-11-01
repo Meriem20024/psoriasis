@@ -11,7 +11,7 @@ Tested on Ubuntu 24.04 (WSL2), Python 3.12.3. Internet access is needed on the f
 (about 160 MB download).
 
 ```bash
-sudo apt update && sudo apt install -y git wget python3 python3-venv python3-pip
+sudo apt update && sudo apt install -y git wget cron python3 python3-venv python3-pip
 ```
 
 ## Installation
