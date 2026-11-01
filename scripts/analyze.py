@@ -22,15 +22,26 @@ def parse_args(argv=None):
     p.add_argument("--outdir", default="results", help="output directory (default: results)")
     p.add_argument("--lfc", type=float, default=1.0, help="min |log2 fold change| (default: 1)")
     p.add_argument("--fdr", type=float, default=0.05, help="max adjusted p-value (default: 0.05)")
-    p.add_argument("--floor", type=float, default=1.0,
+    p.add_argument("--floor", type=float, default=10.0,
                    help="values below this are raised to it before log2, "
-                        "because some intensities are negative (default: 1)")
+                        "because some intensities are negative (default: 10)")
+    p.add_argument("--min-expr", type=float, default=50.0,
+                   help="keep a probe only if its raw intensity is at least this value "
+                        "in --min-samples samples (default: 50)")
+    p.add_argument("--min-samples", type=int, default=14,
+                   help="number of samples that must reach --min-expr (default: 14)")
     return p.parse_args(argv)
 
 
 def log2_transform(values, floor=1.0):
     """log2 of intensities; values below `floor` (including negatives) are set to `floor`."""
     return np.log2(np.clip(values, floor, None))
+
+
+def filter_expressed(expr, min_expr=50.0, min_samples=14):
+    """Keep probes whose raw intensity is >= min_expr in at least min_samples samples."""
+    keep = (expr >= min_expr).sum(axis=1) >= min_samples
+    return expr.loc[keep]
 
 
 def benjamini_hochberg(pvalues):
@@ -99,6 +110,10 @@ def main(argv=None):
     try:
         expr = pd.read_csv(args.expression, sep="\t", index_col=0)
         samples = pd.read_csv(args.samples, sep="\t", dtype={"patient": str})
+        n_before = len(expr)
+        expr = filter_expressed(expr, args.min_expr, args.min_samples)
+        if expr.empty:
+            raise ValueError("No probe passes the expression filter")
         res = run_analysis(expr, samples, args.floor, args.lfc, args.fdr)
     except (OSError, ValueError, KeyError) as exc:
         print(f"[ERROR] {exc}", file=sys.stderr)
@@ -110,9 +125,11 @@ def main(argv=None):
 
     sig = res[res["significant"]]
     summary = {
+        "n_probes_before_filter": n_before,
         "n_probes": int(len(res)),
         "n_pairs": int(samples["patient"].nunique()),
-        "thresholds": {"abs_log2fc": args.lfc, "fdr": args.fdr, "floor": args.floor},
+        "thresholds": {"abs_log2fc": args.lfc, "fdr": args.fdr, "floor": args.floor,
+                       "min_expr": args.min_expr, "min_samples": args.min_samples},
         "n_significant": int(len(sig)),
         "n_higher_in_lesional": int((sig["mean_log2fc"] > 0).sum()),
         "n_lower_in_lesional": int((sig["mean_log2fc"] < 0).sum()),

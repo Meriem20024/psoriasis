@@ -34,3 +34,12 @@ def test_run_analysis_finds_the_up_probe():
     res = analyze.run_analysis(expr, samples).set_index("probe")
     assert abs(res.loc["up", "mean_log2fc"] - 3) < 0.2
     assert abs(res.loc["flat", "mean_log2fc"]) < 0.5
+
+
+def test_filter_expressed_removes_low_probes():
+    expr = pd.DataFrame(
+        {"a": [100, 2], "b": [120, -5], "c": [90, 3], "d": [110, 1]},
+        index=["expressed", "noise"],
+    )
+    kept = analyze.filter_expressed(expr, min_expr=50, min_samples=3)
+    assert list(kept.index) == ["expressed"]
