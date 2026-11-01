@@ -38,7 +38,15 @@ trap 'log WARN "Interrupted"; exit 130' INT TERM
 main() {
     log INFO "Pipeline started (threshold=$THRESHOLD, output=$OUT_DIR)"
     "$ROOT/scripts/fetch.sh" "$ROOT/data/raw"
-    # next: clean.sh, analyze.py, archive
+    "$ROOT/scripts/clean.sh" "$ROOT/data/raw" "$ROOT/data/processed"
+    PY="$ROOT/.venv/bin/python"
+    [[ -x "$PY" ]] || die "Python environment missing. Run: python3 -m venv .venv && .venv/bin/pip install -r requirements.txt" 9
+    log INFO "Running statistical analysis"
+    "$PY" "$ROOT/scripts/analyze.py" \
+        --expression "$ROOT/data/processed/expression.tsv" \
+        --samples "$ROOT/data/processed/samples.tsv" \
+        --outdir "$OUT_DIR" --lfc "$THRESHOLD"
+    # next: archive
     log INFO "Pipeline finished"
 }
 

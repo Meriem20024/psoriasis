@@ -1,0 +1,36 @@
+import sys
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+import analyze
+
+
+def test_log2_transform_floors_negative_values():
+    out = analyze.log2_transform(np.array([-5.0, 1.0, 8.0]), floor=1.0)
+    assert np.allclose(out, [0.0, 0.0, 3.0])
+
+
+def test_benjamini_hochberg():
+    fdr = analyze.benjamini_hochberg([0.01, 0.04, 0.03, 0.5])
+    assert np.allclose(fdr, [0.04, 0.05333, 0.05333, 0.5], atol=1e-3)
+
+
+def test_run_analysis_finds_the_up_probe():
+    samples = pd.DataFrame({
+        "sample_id": ["L1", "L2", "L3", "L4", "N1", "N2", "N3", "N4"],
+        "patient": ["p1", "p2", "p3", "p4"] * 2,
+        "group": ["lesional"] * 4 + ["non_lesional"] * 4,
+    })
+    expr = pd.DataFrame(
+        {
+            "L1": [80, 10], "L2": [100, 12], "L3": [90, 11], "L4": [110, 13],
+            "N1": [10, 11], "N2": [12, 11], "N3": [11, 12], "N4": [13, 12],
+        },
+        index=["up", "flat"],
+    )
+    res = analyze.run_analysis(expr, samples).set_index("probe")
+    assert abs(res.loc["up", "mean_log2fc"] - 3) < 0.2
+    assert abs(res.loc["flat", "mean_log2fc"]) < 0.5
