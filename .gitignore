@@ -1,0 +1,7 @@
+data/raw/
+data/processed/
+data/checksums.sha256
+logs/
+results/
+__pycache__/
+*.part
