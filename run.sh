@@ -31,6 +31,7 @@ LOG_FILE="$ROOT/logs/run_$(date +%Y%m%d_%H%M%S).log"
 export LOG_FILE
 
 TMP_DIR="$(mktemp -d)"
+export TMP_DIR
 cleanup() { rm -rf "$TMP_DIR"; }
 trap cleanup EXIT
 trap 'log WARN "Interrupted"; exit 130' INT TERM
