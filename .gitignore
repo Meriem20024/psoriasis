@@ -6,3 +6,4 @@ results/
 __pycache__/
 *.part
 .venv/
+LIEN_GIT.txt
