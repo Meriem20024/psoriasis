@@ -35,6 +35,15 @@ cleanup() { rm -rf "$TMP_DIR"; }
 trap cleanup EXIT
 trap 'log WARN "Interrupted"; exit 130' INT TERM
 
+archive_results() {
+    local stamp archive
+    stamp="$(date +%Y%m%d_%H%M%S)"
+    archive="$OUT_DIR/archive_${stamp}.tar.gz"
+    tar -czf "$archive" -C "$OUT_DIR" deg_results.csv summary.json volcano.png
+    tar -tzf "$archive" > /dev/null || die "Archive is corrupted: $archive" 10
+    log INFO "Archive created: $archive"
+}
+
 main() {
     log INFO "Pipeline started (threshold=$THRESHOLD, output=$OUT_DIR)"
     "$ROOT/scripts/fetch.sh" "$ROOT/data/raw"
@@ -46,7 +55,7 @@ main() {
         --expression "$ROOT/data/processed/expression.tsv" \
         --samples "$ROOT/data/processed/samples.tsv" \
         --outdir "$OUT_DIR" --lfc "$THRESHOLD"
-    # next: archive
+    archive_results
     log INFO "Pipeline finished"
 }
 
