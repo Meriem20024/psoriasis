@@ -11,7 +11,7 @@ Tested on Ubuntu 24.04 (WSL2), Python 3.12.3. Internet access is needed on the f
 (about 160 MB download).
 
 ```bash
-sudo apt update && sudo apt install -y git wget cron python3 python3-venv python3-pip
+sudo apt update && sudo apt install -y git curl cron python3 python3-venv python3-pip
 ```
 
 ## Installation
@@ -121,3 +121,8 @@ On WSL, cron only runs while WSL is running, and the service must be started wit
 Some intensities in the source data are negative; they are raised to a floor before the
 log transform, and weakly expressed probes are filtered out. Results depend somewhat on
 these two choices (see report). Only 14 patients, one platform, no independent validation.
+
+## Troubleshooting
+
+If the download fails (`Download failed`, exit code 3), check your internet connection and run
+`./run.sh` again: files that were already downloaded and verified are not downloaded twice.
