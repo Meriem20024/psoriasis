@@ -108,13 +108,12 @@ On WSL, cron only runs while WSL is running, and the service must be started wit
 
 ## Work split
 
-| Member | Part |
-|---|---|
-| [Name 1] | [e.g. download and checksums (fetch.sh)] |
-| [Name 2] | [e.g. cleaning and annotation (clean.sh, annotate.sh)] |
-| [Name 3] | [e.g. statistical analysis (analyze.py)] |
-| [Name 4] | [e.g. tests, environment, cron] |
-| [Name 5] | [e.g. documentation and report] |
+Member	                    Assigned Part
+Djebara Meriem	          analyze.py + test_analyze.py
+Benmerabet Mohamed Ali	fetch.sh + clean.sh
+Dahmani Lamis	          add_genes.py + annotate.sh
+Bouhamam Kenza	            utils.sh + installcron.sh
+Bouras Said		          run.sh + integration testing
 
 ## Known limits
 

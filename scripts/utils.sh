@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Shared helper functions, sourced by run.sh and the other scripts.
+
 
 log() {                      # log LEVEL message...
     local level="$1"; shift

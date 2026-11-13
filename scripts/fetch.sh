@@ -8,7 +8,7 @@ SUMS="$RAW_DIR/../checksums.sha256"
 BASE="https://ftp.ncbi.nlm.nih.gov/geo"
 FILES=("series/GSE34nnn/GSE34248/matrix/GSE34248_series_matrix.txt.gz" "series/GSE34nnn/GSE34248/suppl/GSE34248_RAW.tar" "platforms/GPLnnn/GPL570/annot/GPL570.annot.gz")
 
-# download URL DEST: retries, resumes a broken transfer, shows real errors
+
 download() {
     local url="$1" dest="$2"
     rm -f "$dest.part"
@@ -32,7 +32,7 @@ for f in "${FILES[@]}"; do
         || die "Download failed: $name (check your connection, then run ./run.sh again)" 3
 done
 
-# Integrity: test the archives, then create or verify SHA-256 checksums
+
 gzip -t "$RAW_DIR/GSE34248_series_matrix.txt.gz" || die "Corrupted file: series matrix" 4
 gzip -t "$RAW_DIR/GPL570.annot.gz" || die "Corrupted file: annotation" 4
 tar -tf "$RAW_DIR/GSE34248_RAW.tar" > /dev/null || die "Corrupted file: RAW.tar" 4

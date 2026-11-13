@@ -9,7 +9,7 @@ MATRIX="$RAW_DIR/GSE34248_series_matrix.txt.gz"
 EXPECTED_SAMPLES=28
 TMP_DIR="${TMP_DIR:?TMP_DIR not set: run through run.sh}"
 
-# Sample table: one line per sample (id, title, patient, group)
+
 extract_samples() {
     zcat "$MATRIX" \
         | grep -E '^!Sample_(geo_accession|title)' \
@@ -27,7 +27,7 @@ extract_samples() {
             }' > "$TMP_DIR/samples.tsv"
 }
 
-# Expression table: keep only the data block, drop the "!" lines and quotes
+
 extract_expression() {
     zcat "$MATRIX" \
         | sed -n '/^!series_matrix_table_begin/,/^!series_matrix_table_end/p' \
@@ -44,7 +44,7 @@ extract_samples
 log INFO "Extracting expression matrix"
 extract_expression
 
-# Sanity checks
+
 n=$(( $(wc -l < "$TMP_DIR/samples.tsv") - 1 ))
 [[ "$n" -eq "$EXPECTED_SAMPLES" ]] || die "Expected $EXPECTED_SAMPLES samples, found $n" 6
 
